@@ -1,0 +1,777 @@
+<!DOCTYPE aesl-source>
+<network>
+
+<!--list of global events-->
+
+<!--list of constants-->
+
+<!--show keywords state-->
+<keywords flag="true"/>
+
+<!--node thymio-II-->
+<node nodeId="51938" name="thymio-II">
+
+var init
+var pente
+var oben
+var unten
+
+
+sub open
+	call leds.circle(32,32,32,0,0,0,32,32)
+
+
+sub unten2
+	call leds.circle(0,0,32,32,32,32,32,0)
+
+
+onevent prox.comm
+	if prox.comm.rx == 10 then
+		init = 0
+		call leds.circle(0,0,0,0,0,0,0,0)
+	end
+
+
+onevent acc
+	pente = acc[1]
+	if pente &gt; 0 then
+		call leds.top(32,0,0)
+	end
+	if pente &lt;= 0 then
+		call leds.top(0,19,0)
+	end
+	if init == 10 then
+		if pente &gt; 0 then
+			prox.comm.tx = 10
+			motor.left.target = 100
+			motor.right.target = 100
+			call leds.bottom.left(0,0,19)
+			call leds.bottom.right(0,0,19)
+		else
+			motor.left.target = 0
+			motor.right.target = 0
+			prox.comm.tx = 0
+			call leds.bottom.left(0,19,0)
+			call leds.bottom.right(0,19,0)
+		end
+	else
+		call leds.bottom.right(32,32,0)
+		call leds.bottom.left(32,32,0)
+		motor.left.target = 0
+		motor.right.target = 0
+	end
+
+
+onevent button.forward
+	when button.forward == 1 do
+		pente = acc[1]
+		init = 10
+		if pente &lt; 0 then
+			callsub open
+			oben = 1
+			unten = 0
+		else
+			callsub unten2
+			unten = 1
+			oben = 0
+		end
+		call prox.comm.enable(1)
+	end
+
+
+onevent button.center
+	when button.center == 1 do
+		init = 0
+		unten = 0
+		oben = 0
+		call leds.circle(0,0,0,0,0,0,0,0)
+	end
+
+
+<toolsPlugins>
+<ThymioBlockly>
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <block type="thymio_event_receive" y="-338" x="38">
+    <field name="EVENT">prox.comm</field>
+    <statement name="HANDLER">
+      <block type="controls_if">
+        <value name="IF0">
+          <shadow type="logic_boolean">
+            <field name="BOOL">TRUE</field>
+          </shadow>
+          <block type="thymio_compare">
+            <field name="OP">EQ</field>
+            <value name="A">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="thymio_sensor_comm"></block>
+            </value>
+            <value name="B">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="math_number">
+                <field name="NUM">10</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="thymio_variable_set">
+            <field name="VAR">init</field>
+            <value name="VALUE">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="thymio_led_circle">
+                <value name="CIRCLE0">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE1">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE2">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE3">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE4">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE5">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE6">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="CIRCLE7">
+                  <shadow type="math_number">
+                    <field name="NUM">32</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+  <block type="thymio_event_update" y="63" x="37">
+    <field name="EVENT">acc</field>
+    <statement name="HANDLER">
+      <block type="variables_set">
+        <field name="VAR">pente</field>
+        <value name="VALUE">
+          <block type="thymio_sensor_acc">
+            <field name="SENSOR">acc[1]</field>
+          </block>
+        </value>
+        <next>
+          <block type="controls_if">
+            <value name="IF0">
+              <shadow type="logic_boolean">
+                <field name="BOOL">TRUE</field>
+              </shadow>
+              <block type="thymio_compare">
+                <field name="OP">GT</field>
+                <value name="A">
+                  <shadow type="math_number">
+                    <field name="NUM">0</field>
+                  </shadow>
+                  <block type="variables_get">
+                    <field name="VAR">pente</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <shadow type="math_number">
+                    <field name="NUM">0</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="thymio_led">
+                <field name="LED">leds.top</field>
+                <field name="COLOR">#ff0000</field>
+              </block>
+            </statement>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <shadow type="logic_boolean">
+                    <field name="BOOL">TRUE</field>
+                  </shadow>
+                  <block type="thymio_compare">
+                    <field name="OP">LTE</field>
+                    <value name="A">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                      <block type="variables_get">
+                        <field name="VAR">pente</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="thymio_led">
+                    <field name="LED">leds.top</field>
+                    <field name="COLOR">#009900</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="controls_if">
+                    <mutation else="1"></mutation>
+                    <value name="IF0">
+                      <shadow type="logic_boolean">
+                        <field name="BOOL">TRUE</field>
+                      </shadow>
+                      <block type="thymio_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="thymio_variable_get">
+                            <field name="VAR">init</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="math_number">
+                            <field name="NUM">10</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="controls_if">
+                        <mutation else="1"></mutation>
+                        <value name="IF0">
+                          <shadow type="logic_boolean">
+                            <field name="BOOL">TRUE</field>
+                          </shadow>
+                          <block type="thymio_compare">
+                            <field name="OP">GT</field>
+                            <value name="A">
+                              <shadow type="math_number">
+                                <field name="NUM">0</field>
+                              </shadow>
+                              <block type="thymio_variable_get">
+                                <field name="VAR">pente</field>
+                              </block>
+                            </value>
+                            <value name="B">
+                              <shadow type="math_number">
+                                <field name="NUM">0</field>
+                              </shadow>
+                            </value>
+                          </block>
+                        </value>
+                        <statement name="DO0">
+                          <block type="thymio_actuator_comm">
+                            <value name="VALUE">
+                              <shadow type="math_number">
+                                <field name="NUM">0</field>
+                              </shadow>
+                              <block type="math_number">
+                                <field name="NUM">10</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="thymio_motors_start">
+                                <field name="COMMAND">FORWARD</field>
+                                <value name="SPEED">
+                                  <shadow type="math_number">
+                                    <field name="NUM">300</field>
+                                  </shadow>
+                                  <block type="math_number">
+                                    <field name="NUM">100</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="thymio_led">
+                                    <field name="LED">leds.bottom.left</field>
+                                    <field name="COLOR">#000099</field>
+                                    <next>
+                                      <block type="thymio_led">
+                                        <field name="LED">leds.bottom.right</field>
+                                        <field name="COLOR">#000099</field>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </statement>
+                        <statement name="ELSE">
+                          <block type="thymio_motors_stop">
+                            <next>
+                              <block type="thymio_actuator_comm">
+                                <value name="VALUE">
+                                  <shadow type="math_number">
+                                    <field name="NUM">0</field>
+                                  </shadow>
+                                  <block type="math_number">
+                                    <field name="NUM">0</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="thymio_led">
+                                    <field name="LED">leds.bottom.left</field>
+                                    <field name="COLOR">#009900</field>
+                                    <next>
+                                      <block type="thymio_led">
+                                        <field name="LED">leds.bottom.right</field>
+                                        <field name="COLOR">#009900</field>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </statement>
+                      </block>
+                    </statement>
+                    <statement name="ELSE">
+                      <block type="thymio_led">
+                        <field name="LED">leds.bottom.right</field>
+                        <field name="COLOR">#ffff00</field>
+                        <next>
+                          <block type="thymio_led">
+                            <field name="LED">leds.bottom.left</field>
+                            <field name="COLOR">#ffff00</field>
+                            <next>
+                              <block type="thymio_motors_stop"></block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="thymio_event_button" y="62" x="688">
+    <field name="BUTTON">button.forward</field>
+    <field name="MODE">PRESS</field>
+    <statement name="HANDLER">
+      <block type="variables_set">
+        <field name="VAR">pente</field>
+        <value name="VALUE">
+          <block type="thymio_sensor_acc">
+            <field name="SENSOR">acc[1]</field>
+          </block>
+        </value>
+        <next>
+          <block type="thymio_variable_set">
+            <field name="VAR">init</field>
+            <value name="VALUE">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="math_number">
+                <field name="NUM">10</field>
+              </block>
+            </value>
+            <next>
+              <block type="controls_if">
+                <mutation else="1"></mutation>
+                <value name="IF0">
+                  <shadow type="logic_boolean">
+                    <field name="BOOL">TRUE</field>
+                  </shadow>
+                  <block type="thymio_compare">
+                    <field name="OP">LT</field>
+                    <value name="A">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                      <block type="thymio_variable_get">
+                        <field name="VAR">pente</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="procedures_callnoreturn">
+                    <mutation name="open"></mutation>
+                    <next>
+                      <block type="thymio_variable_set">
+                        <field name="VAR">oben</field>
+                        <value name="VALUE">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="math_number">
+                            <field name="NUM">1</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="thymio_variable_set">
+                            <field name="VAR">unten</field>
+                            <value name="VALUE">
+                              <shadow type="math_number">
+                                <field name="NUM">0</field>
+                              </shadow>
+                              <block type="math_number">
+                                <field name="NUM">0</field>
+                              </block>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+                <statement name="ELSE">
+                  <block type="procedures_callnoreturn">
+                    <mutation name="unten"></mutation>
+                    <next>
+                      <block type="thymio_variable_set">
+                        <field name="VAR">unten</field>
+                        <value name="VALUE">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="math_number">
+                            <field name="NUM">1</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="thymio_variable_set">
+                            <field name="VAR">oben</field>
+                            <value name="VALUE">
+                              <shadow type="math_number">
+                                <field name="NUM">0</field>
+                              </shadow>
+                              <block type="math_number">
+                                <field name="NUM">0</field>
+                              </block>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+                <next>
+                  <block type="thymio_communication">
+                    <field name="MODE">ENABLE</field>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="thymio_event_button" y="438" x="687">
+    <field name="BUTTON">button.center</field>
+    <field name="MODE">PRESS</field>
+    <statement name="HANDLER">
+      <block type="thymio_variable_set">
+        <field name="VAR">init</field>
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="thymio_variable_set">
+            <field name="VAR">unten</field>
+            <value name="VALUE">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="math_number">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="thymio_variable_set">
+                <field name="VAR">oben</field>
+                <value name="VALUE">
+                  <shadow type="math_number">
+                    <field name="NUM">0</field>
+                  </shadow>
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="thymio_led_circle">
+                    <value name="CIRCLE0">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE1">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE2">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE3">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE4">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE5">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE6">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                    <value name="CIRCLE7">
+                      <shadow type="math_number">
+                        <field name="NUM">32</field>
+                      </shadow>
+                      <block type="math_number">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" y="938" x="13">
+    <field name="NAME">open</field>
+    <statement name="STACK">
+      <block type="thymio_led_circle">
+        <value name="CIRCLE0">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">32</field>
+          </block>
+        </value>
+        <value name="CIRCLE1">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">32</field>
+          </block>
+        </value>
+        <value name="CIRCLE2">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">32</field>
+          </block>
+        </value>
+        <value name="CIRCLE3">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="CIRCLE4">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="CIRCLE5">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="CIRCLE6">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">32</field>
+          </block>
+        </value>
+        <value name="CIRCLE7">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">32</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" y="937" x="413">
+    <field name="NAME">unten</field>
+    <statement name="STACK">
+      <block type="thymio_led_circle">
+        <value name="CIRCLE0">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="CIRCLE1">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="CIRCLE2">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+        </value>
+        <value name="CIRCLE3">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+        </value>
+        <value name="CIRCLE4">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+        </value>
+        <value name="CIRCLE5">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+        </value>
+        <value name="CIRCLE6">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+        </value>
+        <value name="CIRCLE7">
+          <shadow type="math_number">
+            <field name="NUM">32</field>
+          </shadow>
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+</xml>
+</ThymioBlockly>
+</toolsPlugins>
+</node>
+
+</network>
